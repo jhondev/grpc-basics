@@ -4,6 +4,7 @@ import (
 	context "context"
 	"fmt"
 	"grpc-basics/greetpb"
+	"io"
 	"log"
 	"net"
 	"time"
@@ -12,6 +13,23 @@ import (
 )
 
 type greetServiceServer struct {
+}
+
+func (s *greetServiceServer) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
+	fmt.Printf("\nRequest long greet")
+	for  {
+		msg, err := stream.Recv()
+		if err == io.EOF {
+			_ = stream.SendAndClose(&greetpb.LongGreetResponse{Result: "end"})
+			break
+		}
+		if err != nil {
+			log.Fatalf("\nError while reading client stream: %v\n", err)
+		}
+
+		fmt.Printf("\nHello long %v\n", msg.Greeting.FirstName)
+	}
+	return nil
 }
 
 func (s *greetServiceServer) GreetManyTimes(request *greetpb.GreetManyTimesRequest, stream greetpb.GreetService_GreetManyTimesServer) error {

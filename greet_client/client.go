@@ -21,7 +21,17 @@ func main() {
 
 	client := greetpb.NewGreetServiceClient(conn)
 	// doUnary(client)
-	doServerStreaming(client)
+	// doServerStreaming(client)
+	doClientStreaming(client)
+}
+
+func doClientStreaming(client greetpb.GreetServiceClient) {
+	fmt.Println("Starting client streaming")
+	stream, err := client.LongGreet(context.Background())
+	if err != nil {
+		log.Fatalf("Error while calling long greet %v", err)
+	}
+	stream.Send(&greetpb.LongGreetRequest{Greeting: &greetpb.Greeting{FirstName: "long greet"}})
 }
 
 func doUnary(client greetpb.GreetServiceClient) {
